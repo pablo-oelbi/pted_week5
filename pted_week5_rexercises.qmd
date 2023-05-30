@@ -1,0 +1,58 @@
+---
+title: "pted_week5_rexercise"
+format: html
+---
+
+## Preparation
+
+```{r}
+library("readr")
+library("sf")
+library("terra")
+library("dplyr")
+library("lubridate")
+library("ggplot2")
+library("tmap")
+
+wildschwein_BE <- read_delim("wildschwein_BE_2056.csv", ",") |>
+    st_as_sf(coords = c("E", "N"), crs = 2056, remove = FALSE)
+```
+
+## Task 1: Import and visualize spatial data
+
+```{r}
+feldaufnahme <- read_sf("Feldaufnahmen_Fanel.gpkg")
+```
+
+-   What information does the dataset contain?
+
+    -   FieldID, Frucht and geom
+
+-   What is the geometry type of the dataset (possible types are: Point, Lines and Polygons)?
+
+    -   Polygon
+
+-   What are the data types of the other columns?
+
+    -   Numeric (FieldID) and Character (Frucht)
+
+-   What is the coordinate system of the dataset?
+
+    -   CH1903+ / LV95
+
+
+## Task 2: Annotate Trajectories from vector data
+
+```{r}
+# Filter data
+start_date <- "2015-05-01"
+end_date <- "2015-06-30"
+
+wildschwein_filtered <- wildschwein_BE |> 
+  filter(DatetimeUTC >= as.POSIXct(start_date, tz = "UTC"),
+         DatetimeUTC <= as.POSIXct(end_date, tz = "UTC"))
+
+# Join data
+wildschwein_joined <- st_join(wildschwein_filtered, feldaufnahme)
+```
+
